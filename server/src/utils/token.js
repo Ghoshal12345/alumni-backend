@@ -11,7 +11,7 @@ const generateVerificationToken = () => {
         token,
         tokenHash,
     };
-}; use ha
+};
 
 const hashToken = (token) => {
     return createHash("sha256")

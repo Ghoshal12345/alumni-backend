@@ -11,7 +11,7 @@ import RegistrationRouter from "./routes/registration.js";
 import AuthRouter from "./routes/auth.js";
 import ProfileRouter from "./routes/profile.js";
 import AlumniRouter from "./routes/alumni.js";
-
+import MentorshipRouter from "./routes/mentorship.js"; 
 
 const app = express();
 
@@ -54,15 +54,13 @@ app.use("/api/registration", RegistrationRouter);
 app.use("/api/auth", AuthRouter);
 app.use("/api/profile", ProfileRouter);
 app.use("/api/alumni", AlumniRouter);
+app.use("/api/mentorship", MentorshipRouter);
 
 
 // server and DB connection
 const PORT = process.env.PORT || 5000;
 const startServer = async () => {
     try {
-        // console.log("MONGO_URI:", process.env.MONGO_URI);
-        // console.log("PORT:", process.env.PORT);
-        // console.log("CLIENT_URL:", process.env.CLIENT_URL);
         await connectDB(process.env.MONGO_URI);
         app.listen(PORT, () => {
             console.log(`🚀 Server started on port ${PORT}`);

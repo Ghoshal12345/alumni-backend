@@ -18,50 +18,57 @@ const alumniDirectoryQuerySchema = z.object({
         .regex(/^\d+$/, "Invalid page number")
         .transform(Number)
         .refine((value) => value >= 1, "Invalid page number")
-        .default("1"),
+        .default(1),
 
     limit: z
         .string()
         .regex(/^\d+$/, "Invalid limit")
         .transform(Number)
         .refine((value) => value >= 1 && value <= 50, "Invalid limit")
-        .default("12"),
+        .default(12),
 });
 
-const validateAlumniDirectoryQuery = (req, res, next) => {
+function validateAlumniDirectoryQuery (req, res, next) {
     const result = alumniDirectoryQuerySchema.safeParse(req.query);
 
     if (!result.success) {
         return res.status(400).json({
-            message: result.error.issues[0].message,
+            message: "Invalid query parameters",
+            errors: result.error.flatten(),
         });
     }
 
-    req.query = result.data;
+    req.alumniQuery = result.data;
+
+    next();
+};
+
+const alumniProfileParamsSchema = z.object({//before fetching alumni profile, we need to validate the params
+    libraryId: z
+        .string()
+        .trim()
+        .min(1, "Library ID is required")
+        .max(30, "Library ID is too long"),
+});
+
+function validateAlumniProfileParams (req, res, next) {//fn to validate the params before fetching alumni profile
+    const result = alumniProfileParamsSchema.safeParse(req.params);
+
+    if (!result.success) {
+        return res.status(400).json({
+            message: "Invalid alumni identifier",
+            errors: result.error.flatten(),
+        });
+    }
+
+    req.alumniParams = result.data;
+
     next();
 };
 
 export {
     alumniDirectoryQuerySchema,
     validateAlumniDirectoryQuery,
+    alumniProfileParamsSchema,
+    validateAlumniProfileParams,
 };
-
-// what is the purpose of this code?
-// Why pagination?
-/*
-We don't want:
-
-GET /api/alumni
-    ↓
-return 5,000 alumni
-    ↓
-huge response
-    ↓
-slow frontend
-
-Instead:
-
-page = 1
-limit = 12
-
-returns only 12.*/
